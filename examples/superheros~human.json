@@ -1,0 +1,100 @@
+{
+  "Comely Comics": [
+    {
+      "name": "Captain Canuck",
+      "alias": "Tom Evans",
+      "demographic": { "age": 32, "city": "Ottawa", "gender": "male" },
+      "occupation": "RCMP Officer",
+      "team": "The Collective",
+      "villains": [
+        "The Master", "Mr. Gold", "Sasquatch", "The Brain",
+        "Madame Rouge", "The Redcoat", "The Black Queen",
+        "Dr. Omen", "The Wraith", "General Blitz"
+      ]
+    }
+  ],
+  "DC": [
+    {
+      "name": "Batman",
+      "alias": "Bruce Wayne",
+      "demographic": { "age": 42, "city": "Gotham", "gender": "male" },
+      "occupation": "CEO",
+      "team": "Justice League",
+      "villains": [
+        "The Joker", "The Riddler", "The Penguin", "Two-Face",
+        "Catwoman", "Scarecrow", "Poison Ivy", "Bane",
+        "Ra's al Ghul", "Mr. Freeze"
+      ]
+    },
+    {
+      "name": "Wonder Woman",
+      "alias": "Diana Prince",
+      "demographic": {
+        "age": 5000,
+        "city": "Themyscira",
+        "gender": "female"
+      },
+      "occupation": "Ambassador",
+      "team": "Justice League",
+      "villains": [
+        "Ares", "Cheetah", "Circe", "Doctor Poison",
+        "Giganta", "Maxwell Lord", "Silver Swan",
+        "Veronica Cale", "Medusa", "Decay"
+      ]
+    },
+    {
+      "name": "Superman",
+      "alias": "Clark Kent",
+      "demographic": { "age": 35, "city": "Metropolis", "gender": "male" },
+      "firstAppearance": 1938,
+      "occupation": "Journalist",
+      "team": "Justice League",
+      "villains": [
+        "Lex Luthor", "General Zod", "Doomsday", "Brainiac",
+        "Darkseid", "Metallo", "Parasite", "Bizarro",
+        "Toyman", "Livewire"
+      ]
+    }
+  ],
+  "Marvel": [
+    {
+      "name": "Spider-Man",
+      "alias": "Peter Parker",
+      "demographic": { "age": 28, "city": "New York", "gender": "male" },
+      "firstAppearance": 1962,
+      "occupation": "Scientist",
+      "team": "Avengers",
+      "villains": [
+        "Green Goblin", "Doctor Octopus", "Venom", "Sandman",
+        "The Lizard", "Electro", "Vulture", "Mysterio",
+        "Kraven the Hunter", "Kingpin"
+      ]
+    },
+    {
+      "name": "Iron Man",
+      "alias": "Tony Stark",
+      "demographic": { "age": 48, "city": "Malibu", "gender": "male" },
+      "firstAppearance": 1963,
+      "occupation": "CEO",
+      "team": "Avengers",
+      "villains": [
+        "The Mandarin", "Obadiah Stane", "Whiplash",
+        "Justin Hammer", "The Controller", "Crimson Dynamo",
+        "Titanium Man", "Living Laser", "Ghost", "Spymaster"
+      ]
+    },
+    {
+      "name": "Captain America",
+      "alias": "Steve Rogers",
+      "demographic": { "age": 105, "city": "New York", "gender": "male" },
+      "firstAppearance": 1941,
+      "occupation": "Soldier",
+      "team": "Avengers",
+      "villains": [
+        "Red Skull", "Baron Zemo", "Crossbones", "Arnim Zola",
+        "Sin", "Doctor Faustus", "The Winter Soldier",
+        "Batroc the Leaper", "Taskmaster", "Flag-Smasher"
+      ]
+    }
+  ]
+}

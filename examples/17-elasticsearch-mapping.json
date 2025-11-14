@@ -1,0 +1,101 @@
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        },
+        "analyzer": "standard"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "english",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "author": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "email": {
+            "type": "keyword"
+          },
+          "bio": {
+            "type": "text"
+          }
+        }
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "published_date": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+      },
+      "views": {
+        "type": "integer"
+      },
+      "rating": {
+        "type": "float"
+      },
+      "location": {
+        "type": "geo_point"
+      },
+      "metadata": {
+        "type": "nested",
+        "properties": {
+          "key": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "text"
+          }
+        }
+      },
+      "comments": {
+        "type": "nested",
+        "properties": {
+          "user": {
+            "type": "keyword"
+          },
+          "message": {
+            "type": "text"
+          },
+          "timestamp": {
+            "type": "date"
+          },
+          "likes": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 2,
+    "analysis": {
+      "analyzer": {
+        "custom_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "stop", "snowball"]
+        }
+      }
+    }
+  }
+}

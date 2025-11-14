@@ -1,0 +1,250 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS CloudFormation Template for a complete web application with VPC, EC2, RDS, and Load Balancer",
+  "Mappings": {
+    "RegionMap": {
+      "eu-west-1": { "AMI": "ami-047bb4163c506cd98" },
+      "us-east-1": { "AMI": "ami-0c55b159cbfafe1f0" },
+      "us-west-2": { "AMI": "ami-0d1cd67c26f5fca19" }
+    }
+  },
+  "Outputs": {
+    "DBEndpoint": {
+      "Value": { "Fn::GetAtt": [ "RDSInstance", "Endpoint.Address" ] },
+      "Description": "RDS Database Endpoint",
+      "Export": { "Name": { "Fn::Sub": "${AWS::StackName}-DB-Endpoint" } }
+    },
+    "LoadBalancerURL": {
+      "Value": { "Fn::Sub": "http://${ApplicationLoadBalancer.DNSName}" },
+      "Description": "URL of the Application Load Balancer",
+      "Export": { "Name": { "Fn::Sub": "${AWS::StackName}-ALB-URL" } }
+    },
+    "VPCId": {
+      "Value": { "Ref": "VPC" },
+      "Description": "VPC ID",
+      "Export": { "Name": { "Fn::Sub": "${AWS::StackName}-VPC-ID" } }
+    }
+  },
+  "Parameters": {
+    "DBPassword": { "Description": "Database admin password", "MaxLength": 41, "MinLength": 8, "NoEcho": true, "Type": "String" },
+    "EnvironmentName": {
+      "AllowedValues": [ "development", "staging", "production" ],
+      "Default": "production",
+      "Description": "Environment name prefix",
+      "Type": "String"
+    },
+    "InstanceType": {
+      "AllowedValues": [ "t3.micro", "t3.small", "t3.medium", "t3.large" ],
+      "Default": "t3.medium",
+      "Description": "EC2 instance type",
+      "Type": "String"
+    },
+    "KeyName": { "Description": "EC2 KeyPair for SSH access", "Type": "AWS::EC2::KeyPair::KeyName" }
+  },
+  "Resources": {
+    "ALBListener": {
+      "Properties": {
+        "DefaultActions": [ { "TargetGroupArn": { "Ref": "ALBTargetGroup" }, "Type": "forward" } ],
+        "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
+        "Port": 80,
+        "Protocol": "HTTP"
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener"
+    },
+    "ALBTargetGroup": {
+      "Properties": {
+        "Name": { "Fn::Sub": "${EnvironmentName}-TG" },
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/health",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 2,
+        "Port": 80,
+        "Protocol": "HTTP",
+        "UnhealthyThresholdCount": 3,
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+    },
+    "ApplicationLoadBalancer": {
+      "Properties": {
+        "Name": { "Fn::Sub": "${EnvironmentName}-ALB" },
+        "SecurityGroups": [ { "Ref": "WebServerSecurityGroup" } ],
+        "Subnets": [ { "Ref": "PublicSubnet1" }, { "Ref": "PublicSubnet2" } ],
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-ALB" }, "Key": "Name" } ]
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    },
+    "AttachGateway": {
+      "Properties": { "InternetGatewayId": { "Ref": "InternetGateway" }, "VpcId": { "Ref": "VPC" } },
+      "Type": "AWS::EC2::VPCGatewayAttachment"
+    },
+    "AutoScalingGroup": {
+      "Properties": {
+        "AutoScalingGroupName": { "Fn::Sub": "${EnvironmentName}-ASG" },
+        "DesiredCapacity": "2",
+        "HealthCheckGracePeriod": 300,
+        "HealthCheckType": "ELB",
+        "LaunchTemplate": {
+          "Version": { "Fn::GetAtt": [ "LaunchTemplate", "LatestVersionNumber" ] },
+          "LaunchTemplateId": { "Ref": "LaunchTemplate" }
+        },
+        "MaxSize": "6",
+        "MinSize": "2",
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-WebServer" }, "Key": "Name", "PropagateAtLaunch": true } ],
+        "TargetGroupARNs": [ { "Ref": "ALBTargetGroup" } ],
+        "VPCZoneIdentifier": [ { "Ref": "PublicSubnet1" }, { "Ref": "PublicSubnet2" } ]
+      },
+      "Type": "AWS::AutoScaling::AutoScalingGroup"
+    },
+    "DBSecurityGroup": {
+      "Properties": {
+        "GroupDescription": "Security group for RDS database",
+        "SecurityGroupIngress": [
+          {
+            "FromPort": 3306,
+            "IpProtocol": "tcp",
+            "SourceSecurityGroupId": { "Ref": "WebServerSecurityGroup" },
+            "ToPort": 3306
+          }
+        ],
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-DB-SG" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "DBSubnetGroup": {
+      "Properties": {
+        "DBSubnetGroupDescription": "Subnet group for RDS",
+        "SubnetIds": [ { "Ref": "PrivateSubnet1" }, { "Ref": "PrivateSubnet2" } ],
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-DB-SubnetGroup" }, "Key": "Name" } ]
+      },
+      "Type": "AWS::RDS::DBSubnetGroup"
+    },
+    "DefaultPublicRoute": {
+      "DependsOn": "AttachGateway",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": { "Ref": "InternetGateway" },
+        "RouteTableId": { "Ref": "PublicRouteTable" }
+      },
+      "Type": "AWS::EC2::Route"
+    },
+    "InternetGateway": {
+      "Properties": { "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-IGW" }, "Key": "Name" } ] },
+      "Type": "AWS::EC2::InternetGateway"
+    },
+    "LaunchTemplate": {
+      "Properties": {
+        "LaunchTemplateData": {
+          "ImageId": { "Fn::FindInMap": [ "RegionMap", { "Ref": "AWS::Region" }, "AMI" ] },
+          "InstanceType": { "Ref": "InstanceType" },
+          "KeyName": { "Ref": "KeyName" },
+          "SecurityGroupIds": [ { "Ref": "WebServerSecurityGroup" } ],
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y httpd\nsystemctl start httpd\nsystemctl enable httpd\necho '<h1>Hello from ${EnvironmentName}</h1>' > /var/www/html/index.html\n"
+            }
+          }
+        },
+        "LaunchTemplateName": { "Fn::Sub": "${EnvironmentName}-LaunchTemplate" }
+      },
+      "Type": "AWS::EC2::LaunchTemplate"
+    },
+    "PrivateSubnet1": {
+      "Properties": {
+        "AvailabilityZone": { "Fn::Select": [ 0, { "Fn::GetAZs": "" } ] },
+        "CidrBlock": "10.0.10.0/24",
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Private-Subnet-1" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PrivateSubnet2": {
+      "Properties": {
+        "AvailabilityZone": { "Fn::Select": [ 1, { "Fn::GetAZs": "" } ] },
+        "CidrBlock": "10.0.11.0/24",
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Private-Subnet-2" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PublicRouteTable": {
+      "Properties": {
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Public-Routes" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::RouteTable"
+    },
+    "PublicSubnet1": {
+      "Properties": {
+        "AvailabilityZone": { "Fn::Select": [ 0, { "Fn::GetAZs": "" } ] },
+        "CidrBlock": "10.0.1.0/24",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Public-Subnet-1" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PublicSubnet1RouteTableAssociation": {
+      "Properties": { "RouteTableId": { "Ref": "PublicRouteTable" }, "SubnetId": { "Ref": "PublicSubnet1" } },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PublicSubnet2": {
+      "Properties": {
+        "AvailabilityZone": { "Fn::Select": [ 1, { "Fn::GetAZs": "" } ] },
+        "CidrBlock": "10.0.2.0/24",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Public-Subnet-2" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PublicSubnet2RouteTableAssociation": {
+      "Properties": { "RouteTableId": { "Ref": "PublicRouteTable" }, "SubnetId": { "Ref": "PublicSubnet2" } },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "RDSInstance": {
+      "Properties": {
+        "AllocatedStorage": "100",
+        "BackupRetentionPeriod": 7,
+        "DBInstanceClass": "db.t3.medium",
+        "DBInstanceIdentifier": { "Fn::Sub": "${EnvironmentName}-mysql" },
+        "DBName": "applicationdb",
+        "DBSubnetGroupName": { "Ref": "DBSubnetGroup" },
+        "Engine": "mysql",
+        "EngineVersion": "8.0.35",
+        "MasterUsername": "admin",
+        "MasterUserPassword": { "Ref": "DBPassword" },
+        "MultiAZ": true,
+        "PreferredBackupWindow": "03:00-04:00",
+        "PreferredMaintenanceWindow": "sun:04:00-sun:05:00",
+        "StorageType": "gp3",
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-RDS" }, "Key": "Name" } ],
+        "VPCSecurityGroups": [ { "Ref": "DBSecurityGroup" } ]
+      },
+      "Type": "AWS::RDS::DBInstance"
+    },
+    "VPC": {
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-VPC" }, "Key": "Name" } ]
+      },
+      "Type": "AWS::EC2::VPC"
+    },
+    "WebServerSecurityGroup": {
+      "Properties": {
+        "GroupDescription": "Security group for web servers",
+        "SecurityGroupIngress": [
+          { "CidrIp": "0.0.0.0/0", "FromPort": 80, "IpProtocol": "tcp", "ToPort": 80 },
+          { "CidrIp": "0.0.0.0/0", "FromPort": 443, "IpProtocol": "tcp", "ToPort": 443 },
+          { "CidrIp": "0.0.0.0/0", "FromPort": 22, "IpProtocol": "tcp", "ToPort": 22 }
+        ],
+        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-WebServer-SG" }, "Key": "Name" } ],
+        "VpcId": { "Ref": "VPC" }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    }
+  }
+}

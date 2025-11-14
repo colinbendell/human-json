@@ -1,0 +1,43 @@
+{
+  "data": {
+    "repository": {
+      "name": "react",
+      "description": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+      "forkCount": 46000,
+      "issues": {
+        "edges": [
+          {
+            "node": {
+              "author": { "avatarUrl": "https://avatars.githubusercontent.com/u/1234", "login": "user1" },
+              "comments": {
+                "edges": [ { "node": { "author": { "login": "user2" }, "body": "I can reproduce this" } } ],
+                "totalCount": 15
+              },
+              "title": "Bug in useEffect"
+            }
+          }
+        ],
+        "totalCount": 1234
+      },
+      "owner": {
+        "avatarUrl": "https://avatars.githubusercontent.com/u/69631?v=4",
+        "login": "facebook",
+        "url": "https://github.com/facebook"
+      },
+      "pullRequests": {
+        "edges": [
+          {
+            "node": {
+              "author": { "login": "contributor1" },
+              "reviews": { "edges": [ { "node": { "author": { "login": "maintainer1" }, "state": "APPROVED" } } ] },
+              "state": "OPEN",
+              "title": "Fix memory leak"
+            }
+          }
+        ],
+        "totalCount": 567
+      },
+      "stargazerCount": 225000
+    }
+  }
+}

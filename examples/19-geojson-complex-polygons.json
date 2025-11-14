@@ -1,0 +1,108 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "polygon.1",
+      "properties": {
+        "name": "Central Park",
+        "city": "New York",
+        "area": 3.41,
+        "type": "park",
+        "established": "1857-07-21",
+        "visitors_annual": 42000000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-73.9812, 40.7681],
+            [-73.9581, 40.7681],
+            [-73.9581, 40.8006],
+            [-73.9812, 40.8006],
+            [-73.9812, 40.7681]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "multipolygon.1",
+      "properties": {
+        "name": "Hawaii",
+        "state": "HI",
+        "population": 1455271,
+        "capital": "Honolulu"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [-160.073, 22.004],
+              [-160.073, 21.704],
+              [-159.346, 21.704],
+              [-159.346, 22.004],
+              [-160.073, 22.004]
+            ]
+          ],
+          [
+            [
+              [-156.620, 20.920],
+              [-156.620, 20.570],
+              [-155.505, 20.570],
+              [-155.505, 20.920],
+              [-156.620, 20.920]
+            ]
+          ],
+          [
+            [
+              [-157.010, 21.320],
+              [-157.010, 21.230],
+              [-156.790, 21.230],
+              [-156.790, 21.320],
+              [-157.010, 21.320]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "linestring.1",
+      "properties": {
+        "name": "Route 66",
+        "type": "highway",
+        "length_km": 3940,
+        "established": 1926
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-87.621, 41.878],
+          [-90.195, 38.627],
+          [-94.578, 39.099],
+          [-97.337, 35.467],
+          [-101.831, 35.222],
+          [-106.649, 35.084],
+          [-112.074, 33.448],
+          [-118.243, 34.052]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "point.1",
+      "properties": {
+        "name": "Statue of Liberty",
+        "type": "monument",
+        "height_meters": 93,
+        "completed": 1886
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0445, 40.6892]
+      }
+    }
+  ]
+}

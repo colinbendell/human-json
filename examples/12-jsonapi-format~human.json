@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "attributes": {
+        "body": "The shortest article. Ever.",
+        "created": "2015-05-22T14:56:29.000Z",
+        "title": "JSON:API paints my bikeshed!",
+        "updated": "2015-05-22T14:56:28.000Z"
+      },
+      "relationships": {
+        "author": { "data": { "id": "42", "type": "people" } },
+        "comments": { "data": [ { "id": "5", "type": "comments" }, { "id": "12", "type": "comments" } ] }
+      },
+      "type": "articles"
+    }
+  ],
+  "included": [
+    { "id": "42", "attributes": { "name": "John", "age": 80, "gender": "male" }, "type": "people" },
+    {
+      "id": "5",
+      "attributes": { "body": "First!" },
+      "relationships": { "author": { "data": { "id": "2", "type": "people" } } },
+      "type": "comments"
+    },
+    {
+      "id": "12",
+      "attributes": { "body": "I like XML better" },
+      "relationships": { "author": { "data": { "id": "9", "type": "people" } } },
+      "type": "comments"
+    }
+  ],
+  "jsonapi": { "version": "1.0" }
+}

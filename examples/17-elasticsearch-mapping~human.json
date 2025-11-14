@@ -1,0 +1,38 @@
+{
+  "mappings": {
+    "properties": {
+      "author": {
+        "properties": {
+          "name": { "fields": { "keyword": { "type": "keyword" } }, "type": "text" },
+          "bio": { "type": "text" },
+          "email": { "type": "keyword" }
+        },
+        "type": "object"
+      },
+      "comments": {
+        "properties": {
+          "likes": { "type": "integer" },
+          "message": { "type": "text" },
+          "timestamp": { "type": "date" },
+          "user": { "type": "keyword" }
+        },
+        "type": "nested"
+      },
+      "content": { "analyzer": "english", "fields": { "raw": { "type": "keyword" } }, "type": "text" },
+      "location": { "type": "geo_point" },
+      "metadata": { "properties": { "value": { "type": "text" }, "key": { "type": "keyword" } }, "type": "nested" },
+      "published_date": { "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis", "type": "date" },
+      "rating": { "type": "float" },
+      "tags": { "type": "keyword" },
+      "title": { "analyzer": "standard", "fields": { "keyword": { "ignore_above": 256, "type": "keyword" } }, "type": "text" },
+      "views": { "type": "integer" }
+    }
+  },
+  "settings": {
+    "analysis": {
+      "analyzer": { "custom_analyzer": { "filter": [ "lowercase", "stop", "snowball" ], "tokenizer": "standard", "type": "custom" } }
+    },
+    "number_of_replicas": 2,
+    "number_of_shards": 3
+  }
+}

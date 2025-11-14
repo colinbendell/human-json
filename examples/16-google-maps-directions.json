@@ -1,0 +1,97 @@
+{
+  "routes": [
+    {
+      "bounds": {
+        "northeast": {
+          "lat": 42.3601,
+          "lng": -71.0589
+        },
+        "southwest": {
+          "lat": 40.7128,
+          "lng": -74.0060
+        }
+      },
+      "copyrights": "Map data ©2024 Google",
+      "legs": [
+        {
+          "distance": {
+            "text": "215 mi",
+            "value": 346000
+          },
+          "duration": {
+            "text": "3 hours 45 mins",
+            "value": 13500
+          },
+          "end_address": "Boston, MA, USA",
+          "end_location": {
+            "lat": 42.3601,
+            "lng": -71.0589
+          },
+          "start_address": "New York, NY, USA",
+          "start_location": {
+            "lat": 40.7128,
+            "lng": -74.0060
+          },
+          "steps": [
+            {
+              "distance": {
+                "text": "0.2 mi",
+                "value": 322
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 60
+              },
+              "end_location": {
+                "lat": 40.7150,
+                "lng": -74.0070
+              },
+              "html_instructions": "Head <b>north</b> on <b>Broadway</b> toward <b>Park Pl</b>",
+              "polyline": {
+                "points": "w~tlFbaufMkB|@"
+              },
+              "start_location": {
+                "lat": 40.7128,
+                "lng": -74.0060
+              },
+              "travel_mode": "DRIVING",
+              "maneuver": "turn-right"
+            },
+            {
+              "distance": {
+                "text": "50 mi",
+                "value": 80000
+              },
+              "duration": {
+                "text": "45 mins",
+                "value": 2700
+              },
+              "end_location": {
+                "lat": 41.3000,
+                "lng": -72.9000
+              },
+              "html_instructions": "Merge onto <b>I-95 N</b> toward <b>New Haven</b>",
+              "polyline": {
+                "points": "a~tlFvaufMaBnAmCpB..."
+              },
+              "start_location": {
+                "lat": 40.7150,
+                "lng": -74.0070
+              },
+              "travel_mode": "DRIVING"
+            }
+          ],
+          "traffic_speed_entry": [],
+          "via_waypoint": []
+        }
+      ],
+      "overview_polyline": {
+        "points": "w~tlFbaufMkB|@aBnAmCpB..."
+      },
+      "summary": "I-95 N",
+      "warnings": [],
+      "waypoint_order": []
+    }
+  ],
+  "status": "OK"
+}

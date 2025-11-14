@@ -1,0 +1,21 @@
+{
+  "_embedded": {
+    "customer": {
+      "name": "John Doe",
+      "_links": { "orders": { "href": "/customers/1234/orders" }, "self": { "href": "/customers/1234" } },
+      "email": "john@example.com"
+    },
+    "items": [
+      {
+        "name": "Widget",
+        "_links": { "category": { "href": "/categories/electronics" }, "self": { "href": "/products/123" } },
+        "price": 5.1,
+        "quantity": 2
+      }
+    ]
+  },
+  "_links": { "invoice": { "href": "/invoices/873" }, "self": { "href": "/orders/523" }, "warehouse": { "href": "/warehouse/56" } },
+  "currency": "USD",
+  "status": "shipped",
+  "total": 10.2
+}

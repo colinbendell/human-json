@@ -1,0 +1,220 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": { "name": "production", "labels": { "environment": "production", "team": "platform" } }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "app.properties": "environment=production\nlog.level=info\nmax.connections=100\n",
+        "database.url": "postgresql://db.example.com:5432/appdb",
+        "redis.host": "redis.example.com",
+        "redis.port": "6379"
+      },
+      "kind": "ConfigMap",
+      "metadata": { "name": "app-config", "namespace": "production" }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "api-key": "YXBpa2V5MTIzNDU2Nzg5MA==",
+        "database-password": "cGFzc3dvcmQxMjM=",
+        "jwt-secret": "and0c2VjcmV0a2V5MTIzNDU2"
+      },
+      "kind": "Secret",
+      "metadata": { "name": "app-secrets", "namespace": "production" },
+      "type": "Opaque"
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": { "name": "app-storage", "namespace": "production" },
+      "spec": {
+        "accessModes": [ "ReadWriteOnce" ],
+        "resources": { "requests": { "storage": "10Gi" } },
+        "storageClassName": "fast-ssd"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": { "name": "web-app", "labels": { "version": "v1.2.3", "app": "web-app" }, "namespace": "production" },
+      "spec": {
+        "replicas": 3,
+        "selector": { "matchLabels": { "app": "web-app" } },
+        "strategy": { "rollingUpdate": { "maxSurge": 1, "maxUnavailable": 0 }, "type": "RollingUpdate" },
+        "template": {
+          "metadata": {
+            "annotations": { "prometheus.io/path": "/metrics", "prometheus.io/port": "8080", "prometheus.io/scrape": "true" },
+            "labels": { "version": "v1.2.3", "app": "web-app" }
+          },
+          "spec": {
+            "affinity": {
+              "podAntiAffinity": {
+                "preferredDuringSchedulingIgnoredDuringExecution": [
+                  {
+                    "podAffinityTerm": {
+                      "labelSelector": { "matchExpressions": [ { "key": "app", "operator": "In", "values": [ "web-app" ] } ] },
+                      "topologyKey": "kubernetes.io/hostname"
+                    },
+                    "weight": 100
+                  }
+                ]
+              }
+            },
+            "containers": [
+              {
+                "name": "web-app",
+                "env": [
+                  { "name": "ENVIRONMENT", "value": "production" },
+                  {
+                    "name": "DATABASE_URL",
+                    "valueFrom": { "configMapKeyRef": { "name": "app-config", "key": "database.url" } }
+                  },
+                  {
+                    "name": "DATABASE_PASSWORD",
+                    "valueFrom": { "secretKeyRef": { "name": "app-secrets", "key": "database-password" } }
+                  },
+                  { "name": "API_KEY", "valueFrom": { "secretKeyRef": { "name": "app-secrets", "key": "api-key" } } }
+                ],
+                "image": "example.com/web-app:v1.2.3",
+                "imagePullPolicy": "IfNotPresent",
+                "livenessProbe": {
+                  "failureThreshold": 3,
+                  "httpGet": { "path": "/health/live", "port": 8080, "scheme": "HTTP" },
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "ports": [
+                  { "name": "http", "containerPort": 8080, "protocol": "TCP" },
+                  { "name": "metrics", "containerPort": 9090, "protocol": "TCP" }
+                ],
+                "readinessProbe": {
+                  "failureThreshold": 3,
+                  "httpGet": { "path": "/health/ready", "port": 8080, "scheme": "HTTP" },
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 5,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 3
+                },
+                "resources": { "limits": { "cpu": "1000m", "memory": "1Gi" }, "requests": { "cpu": "250m", "memory": "512Mi" } },
+                "volumeMounts": [
+                  { "name": "app-storage", "mountPath": "/var/lib/app/data" },
+                  { "name": "config-volume", "mountPath": "/etc/app/config" }
+                ]
+              },
+              {
+                "name": "sidecar-logger",
+                "image": "example.com/logger:v1.0.0",
+                "resources": { "limits": { "cpu": "100m", "memory": "256Mi" }, "requests": { "cpu": "50m", "memory": "128Mi" } },
+                "volumeMounts": [ { "name": "app-storage", "mountPath": "/var/log/app", "subPath": "logs" } ]
+              }
+            ],
+            "serviceAccountName": "web-app-sa",
+            "volumes": [
+              { "name": "app-storage", "persistentVolumeClaim": { "claimName": "app-storage" } },
+              { "name": "config-volume", "configMap": { "name": "app-config" } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": { "name": "web-app-service", "labels": { "app": "web-app" }, "namespace": "production" },
+      "spec": {
+        "ports": [
+          { "name": "http", "port": 80, "protocol": "TCP", "targetPort": 8080 },
+          { "name": "https", "port": 443, "protocol": "TCP", "targetPort": 8080 }
+        ],
+        "selector": { "app": "web-app" },
+        "sessionAffinity": "ClientIP",
+        "sessionAffinityConfig": { "clientIP": { "timeoutSeconds": 10800 } },
+        "type": "LoadBalancer"
+      }
+    },
+    {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "Ingress",
+      "metadata": {
+        "name": "web-app-ingress",
+        "annotations": {
+          "cert-manager.io/cluster-issuer": "letsencrypt-prod",
+          "kubernetes.io/ingress.class": "nginx",
+          "nginx.ingress.kubernetes.io/rate-limit": "100",
+          "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+        },
+        "namespace": "production"
+      },
+      "spec": {
+        "rules": [
+          {
+            "host": "app.example.com",
+            "http": {
+              "paths": [
+                {
+                  "backend": { "service": { "name": "web-app-service", "port": { "number": 80 } } },
+                  "path": "/",
+                  "pathType": "Prefix"
+                }
+              ]
+            }
+          }
+        ],
+        "tls": [ { "hosts": [ "app.example.com" ], "secretName": "web-app-tls" } ]
+      }
+    },
+    {
+      "apiVersion": "autoscaling/v2",
+      "kind": "HorizontalPodAutoscaler",
+      "metadata": { "name": "web-app-hpa", "namespace": "production" },
+      "spec": {
+        "behavior": {
+          "scaleDown": { "policies": [ { "value": 50, "periodSeconds": 60, "type": "Percent" } ], "stabilizationWindowSeconds": 300 },
+          "scaleUp": {
+            "policies": [
+              { "value": 100, "periodSeconds": 30, "type": "Percent" },
+              { "value": 2, "periodSeconds": 30, "type": "Pods" }
+            ],
+            "selectPolicy": "Max",
+            "stabilizationWindowSeconds": 0
+          }
+        },
+        "maxReplicas": 10,
+        "metrics": [
+          {
+            "resource": { "name": "cpu", "target": { "averageUtilization": 70, "type": "Utilization" } },
+            "type": "Resource"
+          },
+          {
+            "resource": { "name": "memory", "target": { "averageUtilization": 80, "type": "Utilization" } },
+            "type": "Resource"
+          }
+        ],
+        "minReplicas": 3,
+        "scaleTargetRef": { "name": "web-app", "apiVersion": "apps/v1", "kind": "Deployment" }
+      }
+    },
+    { "apiVersion": "v1", "kind": "ServiceAccount", "metadata": { "name": "web-app-sa", "namespace": "production" } },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "Role",
+      "metadata": { "name": "web-app-role", "namespace": "production" },
+      "rules": [ { "apiGroups": [ "" ], "resources": [ "configmaps", "secrets" ], "verbs": [ "get", "list" ] } ]
+    },
+    {
+      "apiVersion": "rbac.authorization.k8s.io/v1",
+      "kind": "RoleBinding",
+      "metadata": { "name": "web-app-rolebinding", "namespace": "production" },
+      "roleRef": { "name": "web-app-role", "apiGroup": "rbac.authorization.k8s.io", "kind": "Role" },
+      "subjects": [ { "name": "web-app-sa", "kind": "ServiceAccount", "namespace": "production" } ]
+    }
+  ],
+  "kind": "List"
+}
