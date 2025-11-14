@@ -24,11 +24,10 @@ for (const file of fixtureFiles) {
   const inputPath = join(inputDir, file);
 
   // Extract parameters using regex
-  const priorityKeys = filename.match(/keys=([^;]+)/)?.[1]?.split(",")?.map((k) => k.trim());
-  if (priorityKeys) {
-    console.log(`Priority keys: ${priorityKeys.join(", ")}`);
-  }
-
+  const priorityKeys = filename
+    .match(/keys=([^;]+)/)?.[1]
+    ?.split(",")
+    ?.map((k) => k.trim());
   const lineLength = parseInt(filename.match(/line_length=(\d+)/)?.[1] || 120, 10);
 
   // Extract base name (everything before __)
@@ -39,7 +38,7 @@ for (const file of fixtureFiles) {
     // Read and parse input
     const inputContent = readFileSync(inputPath, "utf-8");
     const inputData = JSON.parse(inputContent);
-    const options = {}
+    const options = {};
     if (priorityKeys) options.sortPriorityKeys = priorityKeys;
 
     const formattedOutput = HumanJSON.stringify(inputData, 2, lineLength, options);
@@ -47,7 +46,7 @@ for (const file of fixtureFiles) {
     // Write expected output
     writeFileSync(outputPath, formattedOutput, "utf-8");
 
-    console.log(`✓ Updated ${baseName}~human.json`);
+    console.log(`✓ Updated ${baseName}.json`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`✗ Failed to update ${baseName}: ${message}`);
