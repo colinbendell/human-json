@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from "bun:test";
-import HumanJSON from "../src/index.js";
+import { HumanJSON } from "../src/index.js";
 
 describe.concurrent("HumanJSON.stringify", () => {
   describe.concurrent("basic types", () => {

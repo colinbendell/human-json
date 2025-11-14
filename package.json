@@ -1,6 +1,6 @@
 {
-  "name": "humanjson",
-  "version": "1.0.0",
+  "name": "@colinbendell/human-json",
+  "version": "1.1.0",
   "description": "Human readable JSON stringifier with zero dependencies",
   "type": "module",
   "main": "./dist/index.js",

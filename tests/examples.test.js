@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "fs";
 import { join, basename } from "path";
-import HumanJSON from "../src/index.js";
+import { HumanJSON } from "../src/index.js";
 
 /**
  * Get all fixture JSON files

@@ -8,7 +8,7 @@
  * @property {boolean} [appendNewLine=true] - Whether to append a newline at the end
  */
 
-export default class HumanJSON {
+export class HumanJSON {
   /** @type {string} */
   #indent;
   /** @type {boolean} */

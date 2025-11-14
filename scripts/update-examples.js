@@ -8,7 +8,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { join, basename, dirname } from "path";
 import { fileURLToPath } from "url";
-import HumanJSON from "../src/index.js";
+import { HumanJSON } from "../src/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const inputDir = join(__dirname, "../examples");

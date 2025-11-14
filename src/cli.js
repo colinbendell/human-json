@@ -16,7 +16,7 @@
 
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import HumanJSON from "./index.js";
+import { HumanJSON } from "./index.js";
 
 /**
  * Prints usage information
