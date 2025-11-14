@@ -1,12 +1,12 @@
 {
-  "name": "human-json",
+  "name": "humanjson",
   "version": "1.0.0",
   "description": "Human readable JSON stringifier with zero dependencies",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "humanjson": "./dist/cli.js"
+    "humanjson": "dist/cli.js"
   },
   "exports": {
     ".": {
