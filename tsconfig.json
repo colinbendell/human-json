@@ -1,25 +1,28 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "alwaysStrict": true,
     "checkJs": true,
-    "strict": true,
-    "target": "ES2022",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "lib": ["ES2022"],
     "module": "ES2022",
     "moduleResolution": "bundler",
-    "lib": ["ES2022"],
-    "noEmit": true,
+    "noEmit": false,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
+    "noImplicitReturns": true,
     "noImplicitThis": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": true,
-    "alwaysStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "ES2022"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "tests"],
+  "include": ["src/**/*"]
 }
