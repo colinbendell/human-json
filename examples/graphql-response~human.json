@@ -10,7 +10,7 @@
             "node": {
               "author": { "avatarUrl": "https://avatars.githubusercontent.com/u/1234", "login": "user1" },
               "comments": {
-                "edges": [ { "node": { "author": { "login": "user2" }, "body": "I can reproduce this" } } ],
+                "edges": [{ "node": { "author": { "login": "user2" }, "body": "I can reproduce this" } }],
                 "totalCount": 15
               },
               "title": "Bug in useEffect"
@@ -29,7 +29,7 @@
           {
             "node": {
               "author": { "login": "contributor1" },
-              "reviews": { "edges": [ { "node": { "author": { "login": "maintainer1" }, "state": "APPROVED" } } ] },
+              "reviews": { "edges": [{ "node": { "author": { "login": "maintainer1" }, "state": "APPROVED" } }] },
               "state": "OPEN",
               "title": "Fix memory leak"
             }

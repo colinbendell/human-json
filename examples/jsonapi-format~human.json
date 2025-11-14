@@ -10,7 +10,7 @@
       },
       "relationships": {
         "author": { "data": { "id": "42", "type": "people" } },
-        "comments": { "data": [ { "id": "5", "type": "comments" }, { "id": "12", "type": "comments" } ] }
+        "comments": { "data": [{ "id": "5", "type": "comments" }, { "id": "12", "type": "comments" }] }
       },
       "type": "articles"
     }

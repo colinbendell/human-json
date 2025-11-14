@@ -6,8 +6,8 @@
       "name": "Analytics",
       "value": 350,
       "children": [
-        { "name": "Cluster", "value": 120, "children": [ { "name": "AgglomerativeCluster", "value": 3938 }, { "name": "CommunityStructure", "value": 3812 }, { "name": "HierarchicalCluster", "value": 6714 }, { "name": "MergeEdge", "value": 743 } ] },
-        { "name": "Graph", "value": 230, "children": [ { "name": "BetweennessCentrality", "value": 3534 }, { "name": "LinkDistance", "value": 5731 }, { "name": "MaxFlowMinCut", "value": 7840 }, { "name": "ShortestPaths", "value": 5914 }, { "name": "SpanningTree", "value": 3416 } ] }
+        { "name": "Cluster", "value": 120, "children": [{ "name": "AgglomerativeCluster", "value": 3938 }, { "name": "CommunityStructure", "value": 3812 }, { "name": "HierarchicalCluster", "value": 6714 }, { "name": "MergeEdge", "value": 743 }] },
+        { "name": "Graph", "value": 230, "children": [{ "name": "BetweennessCentrality", "value": 3534 }, { "name": "LinkDistance", "value": 5731 }, { "name": "MaxFlowMinCut", "value": 7840 }, { "name": "ShortestPaths", "value": 5914 }, { "name": "SpanningTree", "value": 3416 }] }
       ]
     },
     {
@@ -46,7 +46,7 @@
       "name": "Data",
       "value": 370,
       "children": [
-        { "name": "Converters", "value": 120, "children": [ { "name": "Converters", "value": 721 }, { "name": "DelimitedTextConverter", "value": 4294 }, { "name": "GraphMLConverter", "value": 9800 }, { "name": "IDataConverter", "value": 1314 }, { "name": "JSONConverter", "value": 2220 } ] },
+        { "name": "Converters", "value": 120, "children": [{ "name": "Converters", "value": 721 }, { "name": "DelimitedTextConverter", "value": 4294 }, { "name": "GraphMLConverter", "value": 9800 }, { "name": "IDataConverter", "value": 1314 }, { "name": "JSONConverter", "value": 2220 }] },
         { "name": "DataField", "value": 1759 },
         { "name": "DataSchema", "value": 2165 },
         { "name": "DataSet", "value": 586 },

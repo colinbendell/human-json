@@ -30,7 +30,7 @@
   },
   "settings": {
     "analysis": {
-      "analyzer": { "custom_analyzer": { "filter": [ "lowercase", "stop", "snowball" ], "tokenizer": "standard", "type": "custom" } }
+      "analyzer": { "custom_analyzer": { "filter": ["lowercase", "stop", "snowball"], "tokenizer": "standard", "type": "custom" } }
     },
     "number_of_replicas": 2,
     "number_of_shards": 3

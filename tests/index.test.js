@@ -13,10 +13,10 @@ describe.concurrent("HumanJSON.stringify", () => {
       { input: new Date(1431561600000), expected: '"2015-05-14T00:00:00.000Z"\n' },
       { input: {}, expected: "{}\n" },
       { input: [], expected: "[]\n" },
-      { input: [1, 2, 3], expected: "[ 1, 2, 3 ]\n" },
+      { input: [1, 2, 3], expected: "[1, 2, 3]\n" },
       {
         input: ["a", 1, 12.34, true, false, null, undefined],
-        expected: '[ "a", 1, 12.34, true, false, null, null ]\n',
+        expected: '["a", 1, 12.34, true, false, null, null]\n',
       },
       { input: { a: 1 }, expected: '{ "a": 1 }\n' },
       {
@@ -227,17 +227,29 @@ describe.concurrent("HumanJSON.stringify", () => {
       });
     });
 
-    describe("padBlocks", () => {
-      it("adds padding when enabled", () => {
-        const obj = { a: 1 };
-        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: true });
-        expect(result).toBe('{ "a": 1 }\n');
+    describe("padArray", () => {
+      it("adds padding for arrays", () => {
+        const obj = { a: [1, 2, 3], b: { c: 1 } };
+        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "array" });
+        expect(result).toBe('{"a": [ 1, 2, 3 ], "b": {"c": 1}}\n');
+      });
+
+      it("adds padding for objects", () => {
+        const obj = { a: [1, 2, 3], b: { c: 1 } };
+        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "object" });
+        expect(result).toBe('{ "a": [1, 2, 3], "b": { "c": 1 } }\n');
+      });
+
+      it("adds padding for all", () => {
+        const obj = { a: [1, 2, 3], b: { c: 1 } };
+        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "all" });
+        expect(result).toBe('{ "a": [ 1, 2, 3 ], "b": { "c": 1 } }\n');
       });
 
       it("removes padding when disabled", () => {
-        const obj = { a: 1 };
-        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: false });
-        expect(result).toBe('{"a": 1}\n');
+        const obj = { a: [1, 2, 3], b: { c: 1 } };
+        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "none" });
+        expect(result).toBe('{"a": [1, 2, 3], "b": {"c": 1}}\n');
       });
     });
 
@@ -271,7 +283,7 @@ describe.concurrent("HumanJSON.stringify", () => {
     it("converts Set to array", () => {
       const set = new Set([4, 2, 3]);
       const result = HumanJSON.stringify(set);
-      expect(result).toBe("[ 4, 2, 3 ]\n");
+      expect(result).toBe("[4, 2, 3]\n");
     });
 
     it("handles objects with toJSON method", () => {
@@ -306,7 +318,7 @@ describe.concurrent("HumanJSON.stringify", () => {
         object: { nested: [1, 2, 3] },
       };
       const result = HumanJSON.stringify(mixed);
-      expect(result).toBe('{ "array": [ { "a": 1 }, { "b": 2 } ], "object": { "nested": [ 1, 2, 3 ] } }\n');
+      expect(result).toBe('{ "array": [{ "a": 1 }, { "b": 2 }], "object": { "nested": [1, 2, 3] } }\n');
     });
   });
 
@@ -347,7 +359,7 @@ describe.concurrent("HumanJSON.stringify", () => {
       };
       const result = HumanJSON.stringify(response);
       expect(result).toBe(
-        `{ "data": [ { "name": "Alice", "id": 1 }, { "name": "Bob", "id": 2 } ], "meta": { "page": 1, "total": 2 } }\n`,
+        `{ "data": [{ "name": "Alice", "id": 1 }, { "name": "Bob", "id": 2 }], "meta": { "page": 1, "total": 2 } }\n`,
       );
     });
 

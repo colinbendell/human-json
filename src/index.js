@@ -4,14 +4,17 @@
  * @property {string[]} [sortPriorityKeys=['name', 'id', 'value', 'version', 'date', 'errors']] - Keys to prioritize at the top when sorting
  * @property {boolean} [denseWrapArrays=true] - Whether to densely wrap simple values on the same line
  * @property {boolean} [denseWrapObjects=false] - Whether to densely wrap simple values on the same line
- * @property {boolean} [padBlocks=true] - Whether to add padding around brackets and braces
+ * @property {'none' | 'array' | 'object' | 'all'} [padBlocks='object'] - Whether to add padding around brackets and braces (arrays, and objects)
  * @property {boolean} [appendNewLine=true] - Whether to append a newline at the end
  */
 
+/**
+ * HumanJSON.stringify is 1:1 replacement for JSON.stringify. This class provides human-readable JSON stringification by densly wrapping blocks and sorting keys.
+ */
 export class HumanJSON {
   /** @type {string} */
   #indent;
-  /** @type {boolean} */
+  /** @type {'none' | 'array' | 'object' | 'all'} */
   #padBlocks;
   /** @type {number} */
   #maxLength;
@@ -35,25 +38,23 @@ export class HumanJSON {
   constructor(
     indentSpaces = 2,
     maxLineLength = 120,
-    options = {
-      sortKeys: true,
-      sortPriorityKeys: ["name", "id", "value", "version", "date", "errors"],
-      denseWrapArrays: true,
-      denseWrapObjects: false,
-      padBlocks: true,
-      appendNewLine: true,
-    },
+    {
+      sortKeys = true,
+      sortPriorityKeys = ["name", "id", "value", "version", "date", "errors"],
+      denseWrapArrays = true,
+      denseWrapObjects = false,
+      padBlocks = "object",
+      appendNewLine = true,
+    } = {},
   ) {
     this.#indent = " ".repeat(indentSpaces);
-    this.#padBlocks = options.padBlocks ?? true;
+    this.#padBlocks = padBlocks ?? "object";
     this.#maxLength = this.#indent === "" ? Infinity : maxLineLength || 120;
-    this.#denseWrapArrays = options.denseWrapArrays ?? true;
-    this.#denseWrapObjects = options.denseWrapObjects ?? false;
-    this.#keySorter = new PriorityKeySorter(
-      options.sortPriorityKeys ?? ["name", "id", "value", "version", "date", "errors"],
-    );
-    this.#sortKeys = Boolean(options.sortKeys ?? true);
-    this.#appendNewLine = Boolean(options.appendNewLine ?? true);
+    this.#denseWrapArrays = denseWrapArrays ?? true;
+    this.#denseWrapObjects = denseWrapObjects ?? false;
+    this.#keySorter = new PriorityKeySorter(sortPriorityKeys ?? ["name", "id", "value", "version", "date", "errors"]);
+    this.#sortKeys = Boolean(sortKeys ?? true);
+    this.#appendNewLine = Boolean(appendNewLine ?? true);
   }
 
   /**
@@ -64,19 +65,7 @@ export class HumanJSON {
    * @param {HumanJSONOptions} [options] - Formatting options
    * @returns {string} The formatted JSON string
    */
-  static stringify(
-    obj,
-    indentSpaces = 2,
-    maxLineLength = 120,
-    options = {
-      sortKeys: true,
-      sortPriorityKeys: ["name", "id", "value", "version", "date", "errors"],
-      denseWrapArrays: true,
-      denseWrapObjects: false,
-      padBlocks: true,
-      appendNewLine: true,
-    },
-  ) {
+  static stringify(obj, indentSpaces = 2, maxLineLength = 120, options = {}) {
     return new HumanJSON(indentSpaces, maxLineLength, options).stringify(obj);
   }
 
@@ -95,9 +84,11 @@ export class HumanJSON {
   // are present (unless the user supplied a weird `options.indent` but in
   // that case we don't care since the output would be invalid anyway).
   /** @type {RegExp} */
-  static #STRING_OR_JSON_TOKENS = /("(?:[^\\"]|\\.)*")|[:,\][}{]/g;
+  static #STRING_OR_JSON_TOKENS = /("(?:[^\\"]|\\.)*")|[:,]|[}{]|[\][]/g;
   /** @type {RegExp} */
   static #STRING_OR_MINOR_JSON_TOKENS = /("(?:[^\\"]|\\.)*")|[:,]/g;
+  static #STRING_OR_MINOR_JSON_TOKENS_ARRAY = /("(?:[^\\"]|\\.)*")|[:,]|[\][]/g;
+  static #STRING_OR_MINOR_JSON_TOKENS_OBJECT = /("(?:[^\\"]|\\.)*")|[:,]|[}{]/g;
   /** @type {Map<string, string>} */
   static #PADDING_MAP = new Map([
     ["{", "{ "],
@@ -111,11 +102,15 @@ export class HumanJSON {
   /**
    * Adds padding around JSON tokens for readability
    * @param {string} string - The string to pad
-   * @param {boolean} padBlocks - Whether to pad block delimiters
+   * @param {'none' | 'array' | 'object' | 'all'} padBlocks - Whether to pad block delimiters
    * @returns {string} The padded string
    */
   #pad(string, padBlocks) {
-    const regex = padBlocks ? HumanJSON.#STRING_OR_JSON_TOKENS : HumanJSON.#STRING_OR_MINOR_JSON_TOKENS;
+    let regex = HumanJSON.#STRING_OR_MINOR_JSON_TOKENS;
+    if (padBlocks === "all") regex = HumanJSON.#STRING_OR_JSON_TOKENS;
+    if (padBlocks === "array") regex = HumanJSON.#STRING_OR_MINOR_JSON_TOKENS_ARRAY;
+    if (padBlocks === "object") regex = HumanJSON.#STRING_OR_MINOR_JSON_TOKENS_OBJECT;
+
     return string.replace(regex, (match) => HumanJSON.#PADDING_MAP.get(match) ?? match);
   }
 

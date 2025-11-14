@@ -33,7 +33,7 @@
       "kind": "PersistentVolumeClaim",
       "metadata": { "name": "app-storage", "namespace": "production" },
       "spec": {
-        "accessModes": [ "ReadWriteOnce" ],
+        "accessModes": ["ReadWriteOnce"],
         "resources": { "requests": { "storage": "10Gi" } },
         "storageClassName": "fast-ssd"
       }
@@ -57,7 +57,7 @@
                 "preferredDuringSchedulingIgnoredDuringExecution": [
                   {
                     "podAffinityTerm": {
-                      "labelSelector": { "matchExpressions": [ { "key": "app", "operator": "In", "values": [ "web-app" ] } ] },
+                      "labelSelector": { "matchExpressions": [{ "key": "app", "operator": "In", "values": ["web-app"] }] },
                       "topologyKey": "kubernetes.io/hostname"
                     },
                     "weight": 100
@@ -112,7 +112,7 @@
                 "name": "sidecar-logger",
                 "image": "example.com/logger:v1.0.0",
                 "resources": { "limits": { "cpu": "100m", "memory": "256Mi" }, "requests": { "cpu": "50m", "memory": "128Mi" } },
-                "volumeMounts": [ { "name": "app-storage", "mountPath": "/var/log/app", "subPath": "logs" } ]
+                "volumeMounts": [{ "name": "app-storage", "mountPath": "/var/log/app", "subPath": "logs" }]
               }
             ],
             "serviceAccountName": "web-app-sa",
@@ -167,7 +167,7 @@
             }
           }
         ],
-        "tls": [ { "hosts": [ "app.example.com" ], "secretName": "web-app-tls" } ]
+        "tls": [{ "hosts": ["app.example.com"], "secretName": "web-app-tls" }]
       }
     },
     {
@@ -176,7 +176,7 @@
       "metadata": { "name": "web-app-hpa", "namespace": "production" },
       "spec": {
         "behavior": {
-          "scaleDown": { "policies": [ { "value": 50, "periodSeconds": 60, "type": "Percent" } ], "stabilizationWindowSeconds": 300 },
+          "scaleDown": { "policies": [{ "value": 50, "periodSeconds": 60, "type": "Percent" }], "stabilizationWindowSeconds": 300 },
           "scaleUp": {
             "policies": [
               { "value": 100, "periodSeconds": 30, "type": "Percent" },
@@ -206,14 +206,14 @@
       "apiVersion": "rbac.authorization.k8s.io/v1",
       "kind": "Role",
       "metadata": { "name": "web-app-role", "namespace": "production" },
-      "rules": [ { "apiGroups": [ "" ], "resources": [ "configmaps", "secrets" ], "verbs": [ "get", "list" ] } ]
+      "rules": [{ "apiGroups": [""], "resources": ["configmaps", "secrets"], "verbs": ["get", "list"] }]
     },
     {
       "apiVersion": "rbac.authorization.k8s.io/v1",
       "kind": "RoleBinding",
       "metadata": { "name": "web-app-rolebinding", "namespace": "production" },
       "roleRef": { "name": "web-app-role", "apiGroup": "rbac.authorization.k8s.io", "kind": "Role" },
-      "subjects": [ { "name": "web-app-sa", "kind": "ServiceAccount", "namespace": "production" } ]
+      "subjects": [{ "name": "web-app-sa", "kind": "ServiceAccount", "namespace": "production" }]
     }
   ],
   "kind": "List"

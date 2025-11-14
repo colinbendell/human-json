@@ -10,7 +10,7 @@
   },
   "Outputs": {
     "DBEndpoint": {
-      "Value": { "Fn::GetAtt": [ "RDSInstance", "Endpoint.Address" ] },
+      "Value": { "Fn::GetAtt": ["RDSInstance", "Endpoint.Address"] },
       "Description": "RDS Database Endpoint",
       "Export": { "Name": { "Fn::Sub": "${AWS::StackName}-DB-Endpoint" } }
     },
@@ -28,13 +28,13 @@
   "Parameters": {
     "DBPassword": { "Description": "Database admin password", "MaxLength": 41, "MinLength": 8, "NoEcho": true, "Type": "String" },
     "EnvironmentName": {
-      "AllowedValues": [ "development", "staging", "production" ],
+      "AllowedValues": ["development", "staging", "production"],
       "Default": "production",
       "Description": "Environment name prefix",
       "Type": "String"
     },
     "InstanceType": {
-      "AllowedValues": [ "t3.micro", "t3.small", "t3.medium", "t3.large" ],
+      "AllowedValues": ["t3.micro", "t3.small", "t3.medium", "t3.large"],
       "Default": "t3.medium",
       "Description": "EC2 instance type",
       "Type": "String"
@@ -44,7 +44,7 @@
   "Resources": {
     "ALBListener": {
       "Properties": {
-        "DefaultActions": [ { "TargetGroupArn": { "Ref": "ALBTargetGroup" }, "Type": "forward" } ],
+        "DefaultActions": [{ "TargetGroupArn": { "Ref": "ALBTargetGroup" }, "Type": "forward" }],
         "LoadBalancerArn": { "Ref": "ApplicationLoadBalancer" },
         "Port": 80,
         "Protocol": "HTTP"
@@ -68,9 +68,9 @@
     "ApplicationLoadBalancer": {
       "Properties": {
         "Name": { "Fn::Sub": "${EnvironmentName}-ALB" },
-        "SecurityGroups": [ { "Ref": "WebServerSecurityGroup" } ],
-        "Subnets": [ { "Ref": "PublicSubnet1" }, { "Ref": "PublicSubnet2" } ],
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-ALB" }, "Key": "Name" } ]
+        "SecurityGroups": [{ "Ref": "WebServerSecurityGroup" }],
+        "Subnets": [{ "Ref": "PublicSubnet1" }, { "Ref": "PublicSubnet2" }],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-ALB" }, "Key": "Name" }]
       },
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer"
     },
@@ -85,14 +85,14 @@
         "HealthCheckGracePeriod": 300,
         "HealthCheckType": "ELB",
         "LaunchTemplate": {
-          "Version": { "Fn::GetAtt": [ "LaunchTemplate", "LatestVersionNumber" ] },
+          "Version": { "Fn::GetAtt": ["LaunchTemplate", "LatestVersionNumber"] },
           "LaunchTemplateId": { "Ref": "LaunchTemplate" }
         },
         "MaxSize": "6",
         "MinSize": "2",
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-WebServer" }, "Key": "Name", "PropagateAtLaunch": true } ],
-        "TargetGroupARNs": [ { "Ref": "ALBTargetGroup" } ],
-        "VPCZoneIdentifier": [ { "Ref": "PublicSubnet1" }, { "Ref": "PublicSubnet2" } ]
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-WebServer" }, "Key": "Name", "PropagateAtLaunch": true }],
+        "TargetGroupARNs": [{ "Ref": "ALBTargetGroup" }],
+        "VPCZoneIdentifier": [{ "Ref": "PublicSubnet1" }, { "Ref": "PublicSubnet2" }]
       },
       "Type": "AWS::AutoScaling::AutoScalingGroup"
     },
@@ -107,7 +107,7 @@
             "ToPort": 3306
           }
         ],
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-DB-SG" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-DB-SG" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::SecurityGroup"
@@ -115,8 +115,8 @@
     "DBSubnetGroup": {
       "Properties": {
         "DBSubnetGroupDescription": "Subnet group for RDS",
-        "SubnetIds": [ { "Ref": "PrivateSubnet1" }, { "Ref": "PrivateSubnet2" } ],
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-DB-SubnetGroup" }, "Key": "Name" } ]
+        "SubnetIds": [{ "Ref": "PrivateSubnet1" }, { "Ref": "PrivateSubnet2" }],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-DB-SubnetGroup" }, "Key": "Name" }]
       },
       "Type": "AWS::RDS::DBSubnetGroup"
     },
@@ -130,16 +130,16 @@
       "Type": "AWS::EC2::Route"
     },
     "InternetGateway": {
-      "Properties": { "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-IGW" }, "Key": "Name" } ] },
+      "Properties": { "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-IGW" }, "Key": "Name" }] },
       "Type": "AWS::EC2::InternetGateway"
     },
     "LaunchTemplate": {
       "Properties": {
         "LaunchTemplateData": {
-          "ImageId": { "Fn::FindInMap": [ "RegionMap", { "Ref": "AWS::Region" }, "AMI" ] },
+          "ImageId": { "Fn::FindInMap": ["RegionMap", { "Ref": "AWS::Region" }, "AMI"] },
           "InstanceType": { "Ref": "InstanceType" },
           "KeyName": { "Ref": "KeyName" },
-          "SecurityGroupIds": [ { "Ref": "WebServerSecurityGroup" } ],
+          "SecurityGroupIds": [{ "Ref": "WebServerSecurityGroup" }],
           "UserData": {
             "Fn::Base64": {
               "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y httpd\nsystemctl start httpd\nsystemctl enable httpd\necho '<h1>Hello from ${EnvironmentName}</h1>' > /var/www/html/index.html\n"
@@ -152,35 +152,35 @@
     },
     "PrivateSubnet1": {
       "Properties": {
-        "AvailabilityZone": { "Fn::Select": [ 0, { "Fn::GetAZs": "" } ] },
+        "AvailabilityZone": { "Fn::Select": [0, { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.10.0/24",
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Private-Subnet-1" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-Private-Subnet-1" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::Subnet"
     },
     "PrivateSubnet2": {
       "Properties": {
-        "AvailabilityZone": { "Fn::Select": [ 1, { "Fn::GetAZs": "" } ] },
+        "AvailabilityZone": { "Fn::Select": [1, { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.11.0/24",
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Private-Subnet-2" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-Private-Subnet-2" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::Subnet"
     },
     "PublicRouteTable": {
       "Properties": {
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Public-Routes" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-Public-Routes" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::RouteTable"
     },
     "PublicSubnet1": {
       "Properties": {
-        "AvailabilityZone": { "Fn::Select": [ 0, { "Fn::GetAZs": "" } ] },
+        "AvailabilityZone": { "Fn::Select": [0, { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.1.0/24",
         "MapPublicIpOnLaunch": true,
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Public-Subnet-1" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-Public-Subnet-1" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::Subnet"
@@ -191,10 +191,10 @@
     },
     "PublicSubnet2": {
       "Properties": {
-        "AvailabilityZone": { "Fn::Select": [ 1, { "Fn::GetAZs": "" } ] },
+        "AvailabilityZone": { "Fn::Select": [1, { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.2.0/24",
         "MapPublicIpOnLaunch": true,
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-Public-Subnet-2" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-Public-Subnet-2" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::Subnet"
@@ -219,8 +219,8 @@
         "PreferredBackupWindow": "03:00-04:00",
         "PreferredMaintenanceWindow": "sun:04:00-sun:05:00",
         "StorageType": "gp3",
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-RDS" }, "Key": "Name" } ],
-        "VPCSecurityGroups": [ { "Ref": "DBSecurityGroup" } ]
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-RDS" }, "Key": "Name" }],
+        "VPCSecurityGroups": [{ "Ref": "DBSecurityGroup" }]
       },
       "Type": "AWS::RDS::DBInstance"
     },
@@ -229,7 +229,7 @@
         "CidrBlock": "10.0.0.0/16",
         "EnableDnsHostnames": true,
         "EnableDnsSupport": true,
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-VPC" }, "Key": "Name" } ]
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-VPC" }, "Key": "Name" }]
       },
       "Type": "AWS::EC2::VPC"
     },
@@ -241,7 +241,7 @@
           { "CidrIp": "0.0.0.0/0", "FromPort": 443, "IpProtocol": "tcp", "ToPort": 443 },
           { "CidrIp": "0.0.0.0/0", "FromPort": 22, "IpProtocol": "tcp", "ToPort": 22 }
         ],
-        "Tags": [ { "Value": { "Fn::Sub": "${EnvironmentName}-WebServer-SG" }, "Key": "Name" } ],
+        "Tags": [{ "Value": { "Fn::Sub": "${EnvironmentName}-WebServer-SG" }, "Key": "Name" }],
         "VpcId": { "Ref": "VPC" }
       },
       "Type": "AWS::EC2::SecurityGroup"

@@ -110,7 +110,7 @@
       },
       "engines": { "node": "^20.17.0 || >=22.9.0" },
       "license": "Artistic-2.0",
-      "workspaces": [ "docs", "smoke-tests", "mock-globals", "mock-registry", "workspaces/*" ]
+      "workspaces": ["docs", "smoke-tests", "mock-globals", "mock-registry", "workspaces/*"]
     },
     "docs": {
       "name": "@npmcli/docs",
@@ -1116,7 +1116,7 @@
       "engines": { "node": "^20.17.0 || >=22.9.0" },
       "hasInstallScript": true,
       "license": "ISC",
-      "workspaces": [ "workspace/test-workspace" ]
+      "workspaces": ["workspace/test-workspace"]
     },
     "node_modules/@octokit/auth-token": { "version": "6.0.0", "dev": true, "engines": { "node": ">= 20" }, "license": "MIT" },
     "node_modules/@octokit/core": {
@@ -1761,7 +1761,7 @@
     "node_modules/ci-info": {
       "version": "4.3.1",
       "engines": { "node": ">=8" },
-      "funding": [ { "type": "github", "url": "https://github.com/sponsors/sibiraj-s" } ],
+      "funding": [{ "type": "github", "url": "https://github.com/sponsors/sibiraj-s" }],
       "inBundle": true,
       "integrity": "sha512-Wdy2Igu8OcBpI2pZePZ5oWjPC38tmDVx5WKUXKwlLYkA0ozo85sLsLvkBbBn/sZaSCMFOGZJ14fvW9t5/d7kdA==",
       "license": "MIT",
@@ -2313,7 +2313,7 @@
     "node_modules/domelementtype": {
       "version": "2.3.0",
       "dev": true,
-      "funding": [ { "type": "github", "url": "https://github.com/sponsors/fb55" } ],
+      "funding": [{ "type": "github", "url": "https://github.com/sponsors/fb55" }],
       "license": "BSD-2-Clause"
     },
     "node_modules/domhandler": {
@@ -2992,7 +2992,7 @@
       "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
       "license": "MIT",
       "optional": true,
-      "os": [ "darwin" ],
+      "os": ["darwin"],
       "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
     },
     "node_modules/function-bind": { "version": "1.1.2", "dev": true, "funding": { "url": "https://github.com/sponsors/ljharb" }, "license": "MIT" },
@@ -3791,7 +3791,7 @@
     "node_modules/json-stringify-nice": { "version": "1.1.4", "funding": { "url": "https://github.com/sponsors/isaacs" }, "license": "ISC" },
     "node_modules/json-stringify-safe": { "version": "5.0.1", "dev": true, "license": "ISC" },
     "node_modules/json5": { "version": "2.2.3", "bin": { "json5": "lib/cli.js" }, "dev": true, "engines": { "node": ">=6" }, "license": "MIT" },
-    "node_modules/jsonparse": { "version": "1.3.1", "engines": [ "node >= 0.2.0" ], "inBundle": true, "license": "MIT" },
+    "node_modules/jsonparse": { "version": "1.3.1", "engines": ["node >= 0.2.0"], "inBundle": true, "license": "MIT" },
     "node_modules/jsonpath-plus": {
       "version": "10.3.0",
       "bin": { "jsonpath": "bin/jsonpath-cli.js", "jsonpath-plus": "bin/jsonpath-cli.js" },
@@ -4609,7 +4609,7 @@
       "bin": { "nanoid": "bin/nanoid.cjs" },
       "dev": true,
       "engines": { "node": "^10 || ^12 || ^13.7 || ^14 || >=15.0.1" },
-      "funding": [ { "type": "github", "url": "https://github.com/sponsors/ai" } ],
+      "funding": [{ "type": "github", "url": "https://github.com/sponsors/ai" }],
       "integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==",
       "license": "MIT",
       "peer": true,
@@ -6266,7 +6266,7 @@
     "node_modules/tap": {
       "version": "16.3.10",
       "bin": { "tap": "bin/run.js" },
-      "bundleDependencies": [ "ink", "treport", "@types/react", "@isaacs/import-jsx", "react" ],
+      "bundleDependencies": ["ink", "treport", "@types/react", "@isaacs/import-jsx", "react"],
       "dependencies": {
         "@isaacs/import-jsx": "^4.0.1",
         "@types/react": "^17.0.52",

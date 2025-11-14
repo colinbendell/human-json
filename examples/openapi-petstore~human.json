@@ -37,7 +37,7 @@
           "shipDate": { "format": "date-time", "type": "string" },
           "status": {
             "description": "Order Status",
-            "enum": [ "placed", "approved", "delivered" ],
+            "enum": ["placed", "approved", "delivered"],
             "example": "approved",
             "type": "string"
           }
@@ -51,10 +51,10 @@
           "id": { "example": 10, "format": "int64", "type": "integer" },
           "category": { "$ref": "#/components/schemas/Category" },
           "photoUrls": { "items": { "type": "string", "xml": { "name": "photoUrl" } }, "type": "array", "xml": { "wrapped": true } },
-          "status": { "description": "pet status in the store", "enum": [ "available", "pending", "sold" ], "type": "string" },
+          "status": { "description": "pet status in the store", "enum": ["available", "pending", "sold"], "type": "string" },
           "tags": { "items": { "$ref": "#/components/schemas/Tag" }, "type": "array", "xml": { "wrapped": true } }
         },
-        "required": [ "name", "photoUrls" ],
+        "required": ["name", "photoUrls"],
         "type": "object",
         "xml": { "name": "pet" }
       },
@@ -127,9 +127,9 @@
           "422": { "description": "Validation exception" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Add a new pet to the store.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       },
       "put": {
         "description": "Update an existing pet by Id.",
@@ -156,9 +156,9 @@
           "422": { "description": "Validation exception" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Update an existing pet.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       }
     },
     "/pet/{petId}": {
@@ -180,9 +180,9 @@
           "400": { "description": "Invalid pet value" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Deletes a pet.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       },
       "get": {
         "description": "Returns a single pet.",
@@ -208,9 +208,9 @@
           "404": { "description": "Pet not found" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "api_key": [] }, { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "api_key": [] }, { "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Find pet by ID.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       },
       "post": {
         "description": "Updates a pet resource based on the form data.",
@@ -247,9 +247,9 @@
           "400": { "description": "Invalid input" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Updates a pet in the store with form data.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       }
     },
     "/pet/{petId}/uploadImage": {
@@ -282,9 +282,9 @@
           "404": { "description": "Pet not found" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Uploads an image.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       }
     },
     "/pet/findByStatus": {
@@ -298,7 +298,7 @@
             "explode": true,
             "in": "query",
             "required": true,
-            "schema": { "default": "available", "enum": [ "available", "pending", "sold" ], "type": "string" }
+            "schema": { "default": "available", "enum": ["available", "pending", "sold"], "type": "string" }
           }
         ],
         "responses": {
@@ -312,9 +312,9 @@
           "400": { "description": "Invalid status value" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Finds Pets by status.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       }
     },
     "/pet/findByTags": {
@@ -342,9 +342,9 @@
           "400": { "description": "Invalid tag value" },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "petstore_auth": [ "write:pets", "read:pets" ] } ],
+        "security": [{ "petstore_auth": ["write:pets", "read:pets"] }],
         "summary": "Finds Pets by tags.",
-        "tags": [ "pet" ]
+        "tags": ["pet"]
       }
     },
     "/store/inventory": {
@@ -360,9 +360,9 @@
           },
           "default": { "description": "Unexpected error" }
         },
-        "security": [ { "api_key": [] } ],
+        "security": [{ "api_key": [] }],
         "summary": "Returns pet inventories by status.",
-        "tags": [ "store" ]
+        "tags": ["store"]
       }
     },
     "/store/order": {
@@ -386,7 +386,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Place an order for a pet.",
-        "tags": [ "store" ]
+        "tags": ["store"]
       }
     },
     "/store/order/{orderId}": {
@@ -409,7 +409,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Delete purchase order by identifier.",
-        "tags": [ "store" ]
+        "tags": ["store"]
       },
       "get": {
         "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
@@ -436,7 +436,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Find purchase order by ID.",
-        "tags": [ "store" ]
+        "tags": ["store"]
       }
     },
     "/user": {
@@ -462,7 +462,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Create user.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       }
     },
     "/user/{username}": {
@@ -485,7 +485,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Delete user resource.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       },
       "get": {
         "description": "Get user detail based on username.",
@@ -512,7 +512,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Get user by user name.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       },
       "put": {
         "description": "This can only be done by the logged in user.",
@@ -541,7 +541,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Update user resource.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       }
     },
     "/user/createWithList": {
@@ -562,7 +562,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Creates list of users with given input array.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       }
     },
     "/user/login": {
@@ -601,7 +601,7 @@
           "default": { "description": "Unexpected error" }
         },
         "summary": "Logs user into the system.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       }
     },
     "/user/logout": {
@@ -611,11 +611,11 @@
         "parameters": [],
         "responses": { "200": { "description": "successful operation" }, "default": { "description": "Unexpected error" } },
         "summary": "Logs out current logged in user session.",
-        "tags": [ "user" ]
+        "tags": ["user"]
       }
     }
   },
-  "servers": [ { "url": "/api/v3" } ],
+  "servers": [{ "url": "/api/v3" }],
   "tags": [
     {
       "name": "pet",
