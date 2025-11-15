@@ -1,7 +1,11 @@
 {
   "name": "@colinbendell/human-json",
   "version": "1.3.0",
+  "author": "Colin Bendell <colin@bendell.com>",
   "description": "Human readable JSON stringifier with zero dependencies",
+  "repository": "https://github.com/colinbendell/human-json",
+  "homepage": "https://github.com/colinbendell/human-json",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -37,8 +41,6 @@
     "pretty-print",
     "formatter"
   ],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "bun-types": "^1.3.2",
