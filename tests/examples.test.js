@@ -32,13 +32,13 @@ describe.concurrent("Fixture tests - comparing with expected output", () => {
       const expectedPath = join(fixturesDir, `${filename.replace(/__.*$/, "")}~human.json`);
       const expectedContent = readFileSync(expectedPath, "utf-8");
 
-      const priorityKeys = filename
+      const firstKeys = filename
         .match(/keys=([^;]+)/)?.[1]
         ?.split(",")
         ?.map((k) => k.trim());
       const lineLength = parseInt(filename.match(/line_length=(\d+)/)?.[1] || 120, 10);
       const options = {};
-      if (priorityKeys) options.sortPriorityKeys = priorityKeys;
+      if (firstKeys) options.firstKeys = firstKeys;
 
       // Format with HumanJSON using default settings (max line length 80 for fixtures)
       const result = HumanJSON.stringify(inputData, 2, lineLength, options);

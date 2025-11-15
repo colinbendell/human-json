@@ -1,27 +1,24 @@
 /**
  * @typedef {Object} HumanJSONOptions
  * @property {boolean} [sortKeys=true] - Whether to sort object keys alphabetically
- * @property {string[]} [sortPriorityKeys=['name', 'id', 'value', 'version', 'date', 'errors']] - Keys to prioritize at the top when sorting
- * @property {boolean} [denseWrapArrays=true] - Whether to densely wrap simple values on the same line
- * @property {boolean} [denseWrapObjects=false] - Whether to densely wrap simple values on the same line
- * @property {'none' | 'array' | 'object' | 'all'} [padBlocks='object'] - Whether to add padding around brackets and braces (arrays, and objects)
+ * @property {string[]} [firstKeys=['name', 'id', 'value', 'version', 'date', 'errors']] - Keys to prioritize at the top when sorting
+ * @property {'none' | 'array' | 'object' | 'all'} [fill='array'] - Whether to fill wrap simple values on the same line
+ * @property {'none' | 'array' | 'object' | 'all'} [spacing='object'] - Whether to add padding around brackets and braces (arrays, and objects)
  * @property {boolean} [appendNewLine=true] - Whether to append a newline at the end
  */
 
 /**
- * HumanJSON.stringify is 1:1 replacement for JSON.stringify. This class provides human-readable JSON stringification by densly wrapping blocks and sorting keys.
+ * HumanJSON.stringify is 1:1 replacement for JSON.stringify. This class provides human-readable JSON stringification by fill wrapping blocks and sorting keys.
  */
 export class HumanJSON {
   /** @type {string} */
   #indent;
   /** @type {'none' | 'array' | 'object' | 'all'} */
-  #padBlocks;
+  #spacing;
   /** @type {number} */
   #maxLength;
-  /** @type {boolean} */
-  #denseWrapArrays;
-  /** @type {boolean} */
-  #denseWrapObjects;
+  /** @type {'none' | 'array' | 'object' | 'all'} */
+  #fill;
   /** @type {PriorityKeySorter} */
   #keySorter;
   /** @type {boolean} */
@@ -40,32 +37,47 @@ export class HumanJSON {
     maxLineLength = 120,
     {
       sortKeys = true,
-      sortPriorityKeys = ["name", "id", "value", "version", "date", "errors"],
-      denseWrapArrays = true,
-      denseWrapObjects = false,
-      padBlocks = "object",
+      firstKeys = ["name", "id", "value", "version", "date", "errors"],
+      fill = "array",
+      spacing = "object",
       appendNewLine = true,
     } = {},
   ) {
     this.#indent = " ".repeat(indentSpaces);
-    this.#padBlocks = padBlocks ?? "object";
+    this.#spacing = spacing ?? "object";
     this.#maxLength = this.#indent === "" ? Infinity : maxLineLength || 120;
-    this.#denseWrapArrays = denseWrapArrays ?? true;
-    this.#denseWrapObjects = denseWrapObjects ?? false;
-    this.#keySorter = new PriorityKeySorter(sortPriorityKeys ?? ["name", "id", "value", "version", "date", "errors"]);
+    this.#fill = fill ?? "array";
+    this.#keySorter = new PriorityKeySorter(firstKeys ?? ["name", "id", "value", "version", "date", "errors"]);
     this.#sortKeys = Boolean(sortKeys ?? true);
     this.#appendNewLine = Boolean(appendNewLine ?? true);
   }
 
   /**
    * Converts a JavaScript value to a human-readable JSON string
+   *
+   * simply change `JSON.stringify(obj)` --> `HumanJSON.stringify(obj)`
+   *
+   * Special consideration is made so that you can also support the standard Javascript stringify signature
+   * `JSON.stringify(obj, null, 2)` --> `HumanJSON.stringify(obj, null, 2)`
+   *
    * @param {any} obj - The value to stringify
-   * @param {number} [indentSpaces=2] - Number of spaces for indentation
+   * @param {number | null} [indentSpaces=2] - Number of spaces for indentation. Support null for backward compat with JSON.stringify(obj, null, 2). Does not suport legacy function | number[] | string[]
    * @param {number} [maxLineLength=120] - Maximum line length before wrapping
    * @param {HumanJSONOptions} [options] - Formatting options
    * @returns {string} The formatted JSON string
    */
   static stringify(obj, indentSpaces = 2, maxLineLength = 120, options = {}) {
+    // special case to have backward compatibility with the standard Javascript stringify signature
+    // check that the maxLineLength is < 10 and indentSpaces is null
+    // eg: JSON.stringify(obj, null, 2). If so, then indent = maxLineLength
+    if (indentSpaces === null || typeof indentSpaces === "function" || Array.isArray(indentSpaces)) {
+      if (maxLineLength < 10) {
+        indentSpaces = maxLineLength;
+        maxLineLength = 120;
+      } else {
+        indentSpaces = 2;
+      }
+    }
     return new HumanJSON(indentSpaces, maxLineLength, options).stringify(obj);
   }
 
@@ -128,12 +140,12 @@ export class HumanJSON {
   }
 
   /**
-   * Wraps array items densely, combining multiple items per line when possible
+   * Fill and wrap a line when all the values are simple / primitive types (string, number, boolean, null)
    * @param {string[]} items - Array of stringified items
    * @param {string} nextIndent - The indentation string for the next level
    * @returns {string[]} Array of items, potentially combined on lines
    */
-  #denseWrap(items, nextIndent) {
+  #fillWrap(items, nextIndent) {
     /** @type {string[]} */
     const newItems = [];
     for (const v of items) {
@@ -195,7 +207,7 @@ export class HumanJSON {
     if (!this.#sortKeys || typeof obj !== "object") {
       const available = this.#maxLength - leftMargin.length - rightMarginSize;
       if (trialString.length <= available) {
-        const prettified = this.#pad(trialString, this.#padBlocks).trim();
+        const prettified = this.#pad(trialString, this.#spacing).trim();
 
         if (prettified.length <= available) {
           return prettified;
@@ -221,8 +233,8 @@ export class HumanJSON {
           this.#stringify(v, nextIndent, 2) ?? "null", // Convert undefined to null
         );
       }
-      if (this.#denseWrapArrays && this.#containsOnlySimpleValues(values)) {
-        items = this.#denseWrap(items, nextIndent);
+      if (["array", "all"].includes(this.#fill) && this.#containsOnlySimpleValues(values)) {
+        items = this.#fillWrap(items, nextIndent);
       }
 
       delimiters = ["[", "]"];
@@ -244,8 +256,8 @@ export class HumanJSON {
         }
       }
 
-      if (this.#denseWrapObjects && this.#containsOnlySimpleValues(values)) {
-        items = this.#denseWrap(items, nextIndent);
+      if (["object", "all"].includes(this.#fill) && this.#containsOnlySimpleValues(values)) {
+        items = this.#fillWrap(items, nextIndent);
       }
 
       delimiters = ["{", "}"];
@@ -255,11 +267,9 @@ export class HumanJSON {
     if (items.length === 0) {
       return delimiters.join("");
     } else if (items.join(", ").length + leftMargin.length + 2 < this.#maxLength) {
-      return [
-        this.#pad(delimiters[0], this.#padBlocks),
-        items.join(", "),
-        this.#pad(delimiters[1], this.#padBlocks),
-      ].join("");
+      return [this.#pad(delimiters[0], this.#spacing), items.join(", "), this.#pad(delimiters[1], this.#spacing)].join(
+        "",
+      );
     } else {
       return [delimiters[0], this.#indent + items.join(",\n" + nextIndent), delimiters[1]].join("\n" + leftMargin);
     }
@@ -281,17 +291,16 @@ export class HumanJSON {
  */
 class PriorityKeySorter {
   /** @type {Map<string, string>} */
-  #keys;
+  #sortedKeys = new Map();
 
   /**
    * Creates a new PriorityKeySorter
-   * @param {string[]} [keys=['name', 'value', 'version', 'date', 'errors']] - Keys to prioritize when sorting
+   * @param {string[]} [firstKeys=['name', 'value', 'version', 'date', 'errors']] - Keys to prioritize when sorting
    */
-  constructor(keys = ["name", "value", "version", "date", "errors"]) {
+  constructor(firstKeys = ["name", "value", "version", "date", "errors"]) {
     // Prefix priority keys with 001, 002, 003, etc so that when sorting they bubble to the top
-    this.#keys = new Map();
-    for (const [index, key] of keys.entries()) {
-      this.#keys.set(key, `   ${index}`.slice(-3) + key);
+    for (const [index, key] of firstKeys.entries()) {
+      this.#sortedKeys.set(key, `   ${index}`.slice(-3) + key);
     }
   }
 
@@ -302,8 +311,8 @@ class PriorityKeySorter {
    * @returns {number} Comparison result for sorting
    */
   compare(a, b) {
-    const aKey = this.#keys.get(a.toLowerCase()) ?? a;
-    const bKey = this.#keys.get(b.toLowerCase()) ?? b;
+    const aKey = this.#sortedKeys.get(a.toLowerCase()) ?? a;
+    const bKey = this.#sortedKeys.get(b.toLowerCase()) ?? b;
     return aKey.localeCompare(bKey);
   }
 }

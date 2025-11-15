@@ -1,12 +1,13 @@
 # human-json
 
-A Human readable JSON formatter. Zero dependencies.
+A human-readable JSON formatter. Zero dependencies.
 
 Simply replace: `JSON.stringify(obj)` --> `HumanJSON.stringify(obj)`
+Can support legacy drop in: `JSON.stringify(obj, null, 2)` --> `HumanJSON.stringify(obj, null, 2)`
 
 ## Example Output
 
-Noticice: key sorting, `Name` has priority, collapsed output, and dense wrapping for arrays
+> Notice: alphabetical key sorting, priority keys (like `name`) at the top, line length wrapping, and dense wrapping for arrays
 
 ```json
 {
@@ -75,11 +76,11 @@ Standard `JSON.stringify()` creates output that's either too compact (unreadable
 
 ## Features
 
-- **Key Sorting**: Alphabetical ordering of keys
-- **Priority Keys**: Preffered keys always go first (like `name`, `version`)
-- **Collapsed output**: try to keep whole objects/arrays in one line
-- **Dense Wrapping**: For arrays, don't have one item per line, fill a line and wrap groups
-- **Configurable**: Control indentation, line length, sorting, and padding
+- **Key Sorting**: Alphabetical ordering of keys for consistent output
+- **Priority Keys**: Preferred keys always appear first (like `name`, `version`, `id`)
+- **Smart Wrapping**: Keeps small objects and arrays on a single line and when they fit
+- **Fill**: Avoid one item per line for values that don't fit on one line. Pack the values but fill multiple lines instead
+- **Configurable**: Control indentation, line length, sorting, and spacing
 - **Extended Type Support**: Supports Maps, Sets, ArrayBuffers, and custom objects that implement `.toJSON()` methods
 
 ## Installation
@@ -122,37 +123,66 @@ console.log(HumanJSON.stringify(data));
 
 ```bash
 # Format a file
-humanjson input.json
+human-json input.json
 
 # From stdin
 cat data.json | human-json
 
 # Customize formatting
-humanjson data.json --indent 4 --max-length 100 --keys lastname,firstname,age
+human-json data.json --indent 4 --max-length 100 --keys lastname,firstname,age
 ```
 
 ## Configuration
 
-### JavaScript Options
+### JavaScript Configuration
+
+You can use the static method (recommended for simple cases):
 
 ```javascript
-const formatter = new HumanJSON(2, 80, {
-  sortKeys: true, // Sort object keys alphabetically
-  padding: true, // Add spaces around { } and [ ]
-  denseWrapArrays: true, // Pack arrays on one line (only if all items are string/number/bool)
-  denseWrapObject: false, // Pack simple objects on one line (only if all values are string/number/bool )
-  keys: ["name", "id", "version"], // Keys to always show first
+import { HumanJSON } from "human-json";
+
+// Static method - simplest usage
+const formatted = HumanJSON.stringify(data, 2, 80, {
+  sortKeys: true,
+  firstKeys: ["name", "id", "version"],
+  spacing: 'object',
+  fill: 'array',
 });
 ```
 
+Or create an instance for reuse:
+
+```javascript
+// Instance method - better for multiple calls with same settings
+const formatter = new HumanJSON(2, 80, {
+  sortKeys: true,              // Sort object keys alphabetically (default: true)
+  firstKeys: ["name", "id", "version"], // Keys to prioritize at the top
+  spacing: 'object',           // Add spaces around {} or []. Options: 'all', 'none', 'object', 'array' (default: 'object')
+  fill: 'array',               // Dense wrapping for simple values. Options: 'none', 'array', 'object', 'all' (default: 'array')
+  appendNewLine: true,         // Append newline at end (default: true)
+});
+
+const formatted = formatter.stringify(data);
+```
+
+**Options:**
+
+- `indentSpaces` (number): Number of spaces per indent level (default: 2)
+- `maxLineLength` (number): Maximum line length before wrapping (default: 120)
+- `sortKeys` (boolean): Sort object keys alphabetically (default: true)
+- `firstKeys` (string[]): Keys to prioritize at the top when sorting (default: `["name", "id", "value", "version", "date", "errors"]`)
+- `spacing` ('none' | 'array' | 'object' | 'all'): Add spaces around brackets/braces (default: 'object')
+- `fill` ('none' | 'array' | 'object' | 'all'): Enable dense wrapping for simple values (default: 'array')
+- `appendNewLine` (boolean): Append newline at end of output (default: true)
+
 ### CLI Options
 
-| Option             | Description                     | Default         |
-| ------------------ | ------------------------------- | --------------- |
-| `--indent N`       | Spaces per indent level         | 2               |
-| `--max-length N`   | Maximum line length             | 80              |
-| `--keys key1,key2` | Priority keys (comma-separated) | name,version,id |
+| Option             | Description                          | Default         |
+| ------------------ | ------------------------------------ | --------------- |
+| `--indent N`       | Spaces per indent level              | 2               |
+| `--max-length N`   | Maximum line length                  | 120             |
+| `--keys key1,key2` | Keys to stay first (comma-separated) | name,id,value,version,date,errors |
 
 ## Examples
 
-Look in `examples` and `examples/output` for some real-world input/outputs
+Check the `examples/` directory for real-world input/output pairs. Files ending with `~human.json` show the formatted output.
