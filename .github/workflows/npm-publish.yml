@@ -21,6 +21,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun ci
+      - run: npm whoami
       - run: npm publish
 permissions:
   id-token: write # Required for OIDC
