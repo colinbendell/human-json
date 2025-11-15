@@ -30,7 +30,7 @@ USAGE:
   cat file.json | human-json [options]
 
 OPTIONS:
-  --keys <keys>    Comma-separated list of keys to prioritize at the top
+  --keys <keys>        Comma-separated list of keys to prioritize at the top
                        Example: --priority name,version,date
 
   --indent <spaces>    Number of spaces for indentation (default: 2)
@@ -74,7 +74,7 @@ function parseArgs() {
   let indentSpaces = 2;
   let maxLineLength = 120;
   /** @type {string[] | undefined} */
-  let sortPriorityKeys = undefined;
+  let firstKeys;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -85,7 +85,7 @@ function parseArgs() {
         console.error("Error: --keys requires a comma-separated list of keys");
         process.exit(1);
       }
-      sortPriorityKeys = nextArg.split(",").map((k) => k.trim());
+      firstKeys = nextArg.split(",").map((k) => k.trim());
     } else if (arg === "--indent") {
       const nextArg = args[++i];
       if (!nextArg) {
@@ -128,8 +128,8 @@ function parseArgs() {
   /** @type {import('./index.js').HumanJSONOptions} */
   const options = {};
 
-  if (sortPriorityKeys !== undefined) {
-    options.sortPriorityKeys = sortPriorityKeys;
+  if (firstKeys !== undefined) {
+    options.firstKeys = firstKeys;
   }
 
   return {

@@ -24,7 +24,7 @@ for (const file of fixtureFiles) {
   const inputPath = join(inputDir, file);
 
   // Extract parameters using regex
-  const priorityKeys = filename
+  const firstKeys = filename
     .match(/keys=([^;]+)/)?.[1]
     ?.split(",")
     ?.map((k) => k.trim());
@@ -39,7 +39,7 @@ for (const file of fixtureFiles) {
     const inputContent = readFileSync(inputPath, "utf-8");
     const inputData = JSON.parse(inputContent);
     const options = {};
-    if (priorityKeys) options.sortPriorityKeys = priorityKeys;
+    if (firstKeys) options.firstKeys = firstKeys;
 
     const formattedOutput = HumanJSON.stringify(inputData, 2, lineLength, options);
 

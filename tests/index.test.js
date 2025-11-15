@@ -120,9 +120,8 @@ describe.concurrent("HumanJSON.stringify", () => {
     it("prioritizes specified keys", () => {
       const obj = { z: 1, name: "test", version: "1.0", a: 2 };
       const result = HumanJSON.stringify(obj, 2, 30, {
-        sortKeys: true,
-        sortPriorityKeys: ["name", "version"],
-        denseWrapping: false,
+        firstKeys: ["name", "version"],
+        fill: "none",
       }); // Force wrapping
       expect(result).toBe(
         `{
@@ -144,7 +143,7 @@ describe.concurrent("HumanJSON.stringify", () => {
     });
   });
 
-  describe("indentation", () => {
+  describe.concurrent("indentation", () => {
     it("indents with 2 spaces by default", () => {
       const obj = { a: { b: { c: 1 } } };
       const result = HumanJSON.stringify(obj, 2, 10);
@@ -178,7 +177,7 @@ describe.concurrent("HumanJSON.stringify", () => {
     });
   });
 
-  describe("line length", () => {
+  describe.concurrent("line length", () => {
     it("respects max line length", () => {
       const obj = { a: 1, b: 2, c: 3, d: 4, e: 5 };
       const result = HumanJSON.stringify(obj, 2, 10);
@@ -193,26 +192,22 @@ describe.concurrent("HumanJSON.stringify", () => {
     describe("sortKeys", () => {
       it("sorts keys when enabled", () => {
         const obj = { z: 1, a: 2 };
-        const result = HumanJSON.stringify(obj, 2, 15, { sortKeys: true });
-        expect(result).toContain('"a"');
-        expect(result).toContain('"z"');
-        expect(result.indexOf('"a"')).toBeLessThan(result.indexOf('"z"'));
+        const result = HumanJSON.stringify(obj, 2, 80, { sortKeys: true });
+        expect(result).toBe('{ "a": 2, "z": 1 }\n');
       });
 
       it("does not sort keys when disabled", () => {
         const obj = { z: 1, a: 2 };
         const result = HumanJSON.stringify(obj, 2, 80, { sortKeys: false });
-        expect(result).toContain("z");
-        expect(result).toContain("a");
+        expect(result).toBe('{ "z": 1, "a": 2 }\n');
       });
     });
 
-    describe("sortPriorityKeys", () => {
+    describe("firstKeys", () => {
       it("uses no priority keys", () => {
         const obj = { z: 1, custom: "first", a: 2 };
         const result = HumanJSON.stringify(obj, 2, 80, {
-          sortKeys: true,
-          sortPriorityKeys: [],
+          firstKeys: [],
         });
         expect(result).toBe('{ "a": 2, "custom": "first", "z": 1 }\n');
       });
@@ -220,8 +215,7 @@ describe.concurrent("HumanJSON.stringify", () => {
       it("handles multiple priority keys in order", () => {
         const obj = { z: 1, second: 2, first: 1, a: 3 };
         const result = HumanJSON.stringify(obj, 2, 80, {
-          sortKeys: true,
-          sortPriorityKeys: ["first", "second"],
+          firstKeys: ["first", "second"],
         });
         expect(result).toBe('{ "first": 1, "second": 2, "a": 3, "z": 1 }\n');
       });
@@ -230,25 +224,25 @@ describe.concurrent("HumanJSON.stringify", () => {
     describe("padArray", () => {
       it("adds padding for arrays", () => {
         const obj = { a: [1, 2, 3], b: { c: 1 } };
-        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "array" });
+        const result = HumanJSON.stringify(obj, 2, 80, { spacing: "array" });
         expect(result).toBe('{"a": [ 1, 2, 3 ], "b": {"c": 1}}\n');
       });
 
       it("adds padding for objects", () => {
         const obj = { a: [1, 2, 3], b: { c: 1 } };
-        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "object" });
+        const result = HumanJSON.stringify(obj, 2, 80, { spacing: "object" });
         expect(result).toBe('{ "a": [1, 2, 3], "b": { "c": 1 } }\n');
       });
 
       it("adds padding for all", () => {
         const obj = { a: [1, 2, 3], b: { c: 1 } };
-        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "all" });
+        const result = HumanJSON.stringify(obj, 2, 80, { spacing: "all" });
         expect(result).toBe('{ "a": [ 1, 2, 3 ], "b": { "c": 1 } }\n');
       });
 
       it("removes padding when disabled", () => {
         const obj = { a: [1, 2, 3], b: { c: 1 } };
-        const result = HumanJSON.stringify(obj, 2, 80, { padBlocks: "none" });
+        const result = HumanJSON.stringify(obj, 2, 80, { spacing: "none" });
         expect(result).toBe('{"a": [1, 2, 3], "b": {"c": 1}}\n');
       });
     });
@@ -270,7 +264,7 @@ describe.concurrent("HumanJSON.stringify", () => {
     });
   });
 
-  describe("special types", () => {
+  describe.concurrent("special types", () => {
     it("converts Map to object", () => {
       const map = new Map([
         ["a", 1],
@@ -297,7 +291,7 @@ describe.concurrent("HumanJSON.stringify", () => {
     });
   });
 
-  describe("nested structures", () => {
+  describe.concurrent("nested structures", () => {
     it("handles deeply nested objects", () => {
       const nested = {
         level1: {
@@ -322,7 +316,7 @@ describe.concurrent("HumanJSON.stringify", () => {
     });
   });
 
-  describe("real-world examples", () => {
+  describe.concurrent("real-world examples", () => {
     it("formats package.json-like structure", () => {
       const pkg = {
         dependencies: {
@@ -379,7 +373,7 @@ describe.concurrent("HumanJSON.stringify", () => {
         },
       };
       const result = HumanJSON.stringify(config, 2, 80, {
-        sortPriorityKeys: ["env", "port"],
+        firstKeys: ["env", "port"],
       });
       expect(result).toBe(`{
   "env": "production",
@@ -388,6 +382,44 @@ describe.concurrent("HumanJSON.stringify", () => {
   "features": { "auth": true, "logging": true, "metrics": false }
 }
 `);
+    });
+  });
+
+  describe.concurrent("JSON.stringify() compat", () => {
+    it("handles JSON.stringify(obj)", () => {
+      const obj = { a: { b: { c: 1 } } };
+      const legacy = JSON.stringify(obj);
+      const human = HumanJSON.stringify(obj);
+
+      expect(legacy).toBe(`{"a":{"b":{"c":1}}}`);
+      expect(human).toBe(`{ "a": { "b": { "c": 1 } } }\n`);
+      expect(HumanJSON.stringify(obj, undefined, undefined, { spacing: "none", appendNewLine: false })).toBe(
+        `{"a": {"b": {"c": 1}}}`,
+      );
+    });
+    // test JSON.stringify(obj, null, 2)
+    // test JSON.stringify(obj, (key) => key, 2)
+
+    it("handles JSON.stringify(obj, null, 2)", () => {
+      const obj = { a: { b: { c: 1 } } };
+      const legacy = JSON.stringify(obj, null, 2);
+      const human = HumanJSON.stringify(obj, null, 2);
+      expect(legacy).toBe(`{
+  "a": {
+    "b": {
+      "c": 1
+    }
+  }
+}`);
+      expect(human).toBe(`{ "a": { "b": { "c": 1 } } }\n`);
+    });
+
+    it("handles JSON.stringify(obj, null, 2)", () => {
+      const obj = { a: { b: { c: 1 } } };
+      const legacy = JSON.stringify(obj, (_key, value) => value);
+      const human = HumanJSON.stringify(obj, (_key, value) => value);
+      expect(legacy).toBe(`{"a":{"b":{"c":1}}}`);
+      expect(human).toBe(`{ "a": { "b": { "c": 1 } } }\n`);
     });
   });
 });
