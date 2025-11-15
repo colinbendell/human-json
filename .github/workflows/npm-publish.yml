@@ -22,7 +22,11 @@ jobs:
           bun-version: latest
       - run: bun ci
       - run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 permissions:
   id-token: write # Required for OIDC
   contents: read
